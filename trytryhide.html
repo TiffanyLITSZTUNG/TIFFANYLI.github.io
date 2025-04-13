@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/floating-labels/">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #DEB887;
+        }
+
+        .non-uk-message,
+        .result-message {
+            display: none;
+        }
+    </style>
+    <title>Password Recovery</title>
+</head>
+
+<body>
+    <div class="non-uk-message text-white bg-primary p-3 text-center">
+        We are from the UK, we are the three main characters in Harry Potter: Harry Potter, Ron, and Hermione.
+    </div>
+
+    <form class="form-signin">
+        <div class="text-center mb-4 mt-5">
+            <img class="mb-4" src="https://i.imgur.com/bnBmJFS.jpg" alt="" width="400" height="250">
+            <h1 class="h3 mb-3 font-weight-normal">Harry Potter's Password Recovery</h1>
+        </div>
+
+        <div class="text-left m-5">
+            <div class="p-2 m-5 small large card text-white bg-primary">
+                We are from the UK, we are the three main characters in Harry Potter: Harry Potter, Ron, and Hermione.
+            </div>
+
+            <div class="text-left m-5 p-5">
+                <div class="form-label-group">
+                    <input type="text" id="Username" class="form-control" placeholder="Username" required autofocus>
+                    <label for="Username">Username</label>
+                </div>
+
+                <div class="form-label-group" id="pwdBox">
+                    <input type="password" id="Password" class="form-control" placeholder="Password">
+                    <label for="Password">Password</label>
+                </div>
+
+                <div class="form-label-group" id="secretBox" style="display:none">
+                    <br>
+                    <input type="text" id="Secret" class="form-control" placeholder="Secret Answer">
+                    <label for="Secret"><span id="secretQuestion"></span></label>
+                </div>
+
+                <button class="btn btn-lg btn-primary btn-block" id="sub" type="button">Sign in</button>
+                <br>
+                <a href="#" id="forget">Forget Password</a>
+                <p class="mt-5 mb-3 text-muted text-center result-message"></p>
+            </div>
+        </div>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <script>
+let users = [];
+
+async function fetchUsers() {
+    try {
+        const response = await fetch('https://raw.githubusercontent.com/TiffanyLITSZTUNG/Downloads/refs/heads/main/user.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        users = data;
+        console.log('Fetched users:', users);
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+    }
+}
+
+        $(document).ready(async function () {
+            await fetchUsers();
+            checkIPCountry();
+
+            $('#forget').on('click', function (e) {
+                e.preventDefault();
+                const username = $('#Username').val().trim();
+
+                if (!username) {
+                    $('.result-message').text('Please enter a username first.').show();
+                    return;
+                }
+
+                const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+
+                if (!user) {
+                    $('.result-message').text('Username not found.').show();
+                    return;
+                }
+
+                $('#pwdBox').hide();
+                $('#Password').prop('required', false);
+                $('#secretBox').show();
+                $('#Secret').prop('required', true);
+                $('#sub').text("Recover Password");
+                $('#secretQuestion').text(user.secretQuestion);
+                $('.result-message').hide();
+            });
+
+            $('#sub').on('click', function () {
+                const username = $('#Username').val().trim();
+                const password = $('#Password').val();
+                const secret = $('#Secret').val();
+                const isRecovering = $('#sub').text() === "Recover Password";
+
+                const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+
+                if (!user) {
+                    $('.result-message').text('Username not found.').show();
+                    return;
+                }
+
+                if (isRecovering) {
+                    if (user.secretAnswer.includes(secret)) {
+                        $('.result-message').text(user.secretCorrectMessage).show();
+                    } else {
+                        $('.result-message').text('Incorrect secret answer.').show();
+                    }
+                } else {
+                    if (user.password === password) {
+                        alert(user.passwordCorrectMessage);
+                    } else {
+                        $('.result-message').text('Incorrect password.').show();
+                    }
+                }
+            });
+        });
+
+        async function checkIPCountry() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+
+                if (data.country_code!== 'GB') {
+                    $('form').hide();
+                    $('.non-uk-message').show();
+                }
+            } catch (error) {
+                console.log('IP check failed, showing form anyway');
+            }
+        }
+    </script>
+</body>
+
+</html>
