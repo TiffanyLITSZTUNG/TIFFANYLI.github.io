@@ -75,7 +75,7 @@
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         users = await response.json();
-        console.log('Fetched users:', users); // 打印获取到的用户数据
+        console.log('Fetched users:', users);
         } catch (error) {
         console.error('Failed to fetch users:', error);
         }
