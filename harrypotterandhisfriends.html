@@ -54,7 +54,7 @@
                     <label for="Secret"><span id="secretQuestion"></span></label>
                 </div>
 
-                <button class="btn btn-lg btn-primary btn-block" id="sub" type="submit">Sign in</button>
+                <button class="btn btn-lg btn-primary btn-block" id="sub" type="button">Sign in</button>
                 <br>
                 <a href="#" id="forget">Forget Password</a>
                 <p class="mt-5 mb-3 text-muted text-center result-message"></p>
@@ -65,28 +65,22 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
+    
     <script>
         const ENC = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL1RpZmZhbnlMSVRTWlRVTkcvRG93bmxvYWRzL3JlZnMvaGVhZHMvbWFpbi91c2VyLmpzb24=';
         let users = [];
-
         async function fetchUsers() {
             try {
                 const dec = atob(ENC);
                 const response = await fetch(dec);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                users = await response.json();
-                console.log('Fetched users:', users);
-            } catch (error) {
-                console.error('Failed to fetch users:', error);
-                $('.result-message').text('Failed to fetch user data. Please try again later.').show();
-            }
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        function findUser(username) {
-            return users.find(u => u.username.toLowerCase() === username.toLowerCase());
+        users = await response.json();
+        console.log('Fetched users:', users);
+        } catch (error) {
+        console.error('Failed to fetch users:', error);
+        }
         }
 
         $(document).ready(async function () {
@@ -102,7 +96,7 @@
                     return;
                 }
 
-                const user = findUser(username);
+                const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
 
                 if (!user) {
                     $('.result-message').text('Username not found.').show();
@@ -118,14 +112,13 @@
                 $('.result-message').hide();
             });
 
-            $('form').on('submit', function (e) {
-                e.preventDefault();
+            $('#sub').on('click', function () {
                 const username = $('#Username').val().trim();
                 const password = $('#Password').val();
                 const secret = $('#Secret').val();
                 const isRecovering = $('#sub').text() === "Recover Password";
 
-                const user = findUser(username);
+                const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
 
                 if (!user) {
                     $('.result-message').text('Username not found.').show();
@@ -159,7 +152,6 @@
                 }
             } catch (error) {
                 console.log('IP check failed, showing form anyway');
-                $('.result-message').text('IP check failed. Please try again later.').show();
             }
         }
     </script>
