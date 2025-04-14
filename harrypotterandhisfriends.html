@@ -11,8 +11,8 @@
             background-color: #DEB887;
         }
 
-        .non-uk-message,
-        .result-message {
+       .non-uk-message,
+       .result-message {
             display: none;
         }
     </style>
@@ -63,23 +63,23 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
+    
     <script>
-let users = [];
-
-async function fetchUsers() {
-    try {
-        const response = await fetch('https://raw.githubusercontent.com/TiffanyLITSZTUNG/Downloads/refs/heads/main/user.json');
-        if (!response.ok) {
+        const ENC = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL1RpZmZhbnlMSVRTWlRVTkcvRG93bmxvYWRzL3JlZnMvaGVhZHMvbWFpbi91c2VyLmpzb24=';
+        let users = [];
+        async function fetchUsers() {
+            try {
+                const dec = atob(ENC);
+                const response = await fetch(dec);
+          if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        users = data;
+        users = await response.json();
         console.log('Fetched users:', users);
-    } catch (error) {
+        } catch (error) {
         console.error('Failed to fetch users:', error);
-    }
-}
+        }
+        }
 
         $(document).ready(async function () {
             await fetchUsers();
